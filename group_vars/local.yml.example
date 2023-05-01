@@ -1,0 +1,4 @@
+config_aws_account: '123456789012'
+github_org: snakeoil
+pulumi_bucket_name: snakeoil-bucket
+hide_sensitive_logs: true
