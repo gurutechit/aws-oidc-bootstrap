@@ -1,0 +1,9 @@
+---
+- name: Get AWS caller identity
+  shell: "aws sts get-caller-identity --output json"
+  register: aws_caller_identity
+  tags: always
+- name: Query current AWS account
+  set_fact:
+    current_aws_account: "{{aws_caller_identity.stdout | from_json | community.general.json_query('Account') }}"
+  tags: always

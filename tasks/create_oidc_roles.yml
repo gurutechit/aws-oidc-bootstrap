@@ -1,0 +1,35 @@
+---
+- name: Create a role with description and tags
+  community.aws.iam_role:
+    name: "{{role.name}}-oidc-role"
+    assume_role_policy_document: "{{ lookup('template', role.template) }}"
+    description: "{{role.description}}"
+    tags:
+      ManagedBy: ansible
+      Name: "{{role.name}}-oidc-role"
+    state: present
+  loop: "{{config.oidc_roles}}"
+  loop_control:
+    loop_var: role
+  tags: [ create ]
+
+- name: Create a policy for iam
+  amazon.aws.iam_policy:
+    iam_type: role
+    iam_name: "{{role.name}}-oidc-role"
+    policy_name: "{{role.name}}-oidc-policy"
+    state: present
+    policy_json: "{{ lookup('template', role.policy) }}"
+  loop: "{{config.oidc_roles}}"
+  loop_control:
+    loop_var: role
+  tags: [ create ]
+
+- name: Remove OIDC roles
+  community.aws.iam_role:
+    name: "{{role.name}}-oidc-role"
+    state: absent
+  loop: "{{config.oidc_roles}}"
+  loop_control:
+    loop_var: role
+  tags: [ never, destroy ]

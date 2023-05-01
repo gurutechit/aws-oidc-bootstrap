@@ -1,0 +1,41 @@
+---
+- hosts: all
+  tasks:
+
+    - name: Collecting AWS informations
+      include_tasks: tasks/get_aws_identity.yml
+      tags: [ always ]
+
+    - name: Checking AWS configured account
+      assert:
+        that: "{{config_aws_account == current_aws_account }}"
+        fail_msg: "Wrong AWS account"
+        success_msg: "Correct AWS account"
+      tags: [ always ]
+
+    - name: Collecting OIDC informations
+      include_tasks: tasks/get_oidc_provider.yml
+      tags: [ always ]
+
+    - name: Configure OIDC provider
+      include_tasks: tasks/create_oidc_provider.yml
+      when: not oidc_exist|default('False')|bool
+      tags: [ always, create ]
+
+    - name: Configure OIDC roles
+      include_tasks: tasks/create_oidc_roles.yml
+      tags: [ always, create ]
+
+    - name: Pulumi state bucket
+      amazon.aws.s3_bucket:
+        acl: private
+        encryption: "AES256"
+        name: "{{pulumi_bucket_name}}"
+        state: present
+        object_lock_enabled: false
+        object_ownership: BucketOwnerPreferred
+        versioning: false
+        tags:
+          ManagedBy: ansible
+          Name: "{{pulumi_bucket_name}}"
+        purge_tags: true

@@ -1,0 +1,22 @@
+---
+- name: Query OIDC providers list
+  shell: "aws iam list-open-id-connect-providers --output json"
+  register: oidc_list_raw
+  tags: always
+  no_log: "{{hide_sensitive_logs | default('True')|bool}}"
+- name: Set OIDC providers list
+  set_fact:
+    oidc_list: "{{oidc_list_raw.stdout | from_json}}"
+  tags: always
+  no_log: "{{hide_sensitive_logs | default('True')|bool}}"
+- name: Checking OIDC provider configuration
+  set_fact:
+    oidc_exist: True
+    oidc_arn: "{{item}}"
+  loop: "{{oidc_list.OpenIDConnectProviderList | community.general.json_query('[*].Arn')}}"
+  when:
+    - oidc_list.OpenIDConnectProviderList is defined
+    - oidc_list.OpenIDConnectProviderList|length > 0
+    - config.oidc_provider.Url | urlsplit('hostname') in item
+  tags: always
+  no_log: "{{hide_sensitive_logs | default('True')|bool}}"

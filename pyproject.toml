@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "bootstrap-aws"
+version = "0.1.0"
+description = ""
+authors = ["Gianluca Mascolo <gianluca@gurutech.it>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+ansible = "^7.4.0"
+boto3 = "^1.26.118"
+botocore = "^1.29.118"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

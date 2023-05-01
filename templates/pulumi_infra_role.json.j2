@@ -1,0 +1,32 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "",
+            "Effect": "Allow",
+            "Principal": {
+                "Federated": "{{oidc_arn}}"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringEquals": {
+                    "token.actions.githubusercontent.com:aud": {{config.oidc_provider.ClientIDList | to_json }}
+                },
+                "StringLike": {
+                    "token.actions.githubusercontent.com:sub": [
+{% for repo in role.repositories %}
+                        "repo:{{github_org}}/{{repo}}:*"{% if not loop.last %},{% endif %}
+{% endfor %}
+                    ]
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Principal": {
+            "AWS": "arn:aws:iam::{{config_aws_account}}:root"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}

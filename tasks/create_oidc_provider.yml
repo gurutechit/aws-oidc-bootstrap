@@ -1,0 +1,45 @@
+---
+- name: Create OIDC configuration file
+  tempfile:
+    state: file
+    prefix: "ansible.oidc."
+    suffix: ".json"
+  register: oidc_json
+  tags: [ create ]
+
+- name: Write OIDC configuration file
+  copy:
+    content: "{{config.oidc_provider | to_json}}"
+    dest: "{{oidc_json.path}}"
+  tags: [ create ]
+
+- name: Create OIDC provider
+  shell: "aws iam create-open-id-connect-provider --cli-input-json file://{{oidc_json.path}} --output json"
+  register: oidc_create_raw
+  tags: [ create ]
+
+- name: OIDC provider output
+  debug:
+    msg: "{{oidc_create_raw.stdout.split('\n')}}"
+  tags: [ create ]
+
+- name: Setting OIDC provider configuration
+  set_fact:
+    oidc_exist: True
+    oidc_arn: "{{oidc_create_raw.stdout | from_json | community.general.json_query('OpenIDConnectProviderArn')}}"
+  tags: [ create ]
+
+- name: Remove OIDC configuration file
+  file:
+    path: "{{ oidc_json.path }}"
+    state: absent
+  when:
+    - oidc_json.path is defined
+  tags: [ create ]
+
+- name: Remove OIDC provider
+  shell: "aws iam delete-open-id-connect-provider --open-id-connect-provider-arn {{oidc_arn}}"
+  when:
+    - oidc_exist|default('False')|bool
+  tags: [ never, destroy ]
+  no_log: "{{hide_sensitive_logs | default('True')|bool}}"

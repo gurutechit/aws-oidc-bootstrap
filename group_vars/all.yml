@@ -1,0 +1,20 @@
+---
+config:
+  oidc_provider:
+    Url: "https://token.actions.githubusercontent.com"
+    ClientIDList:
+      - sts.amazonaws.com
+    ThumbprintList:
+      - 6938fd4d98bab03faadb97b34396831e3780aea1
+    Tags:
+      - Key: Name
+        Value: github-oidc-provider
+      - Key: ManagedBy
+        Value: ansible
+  oidc_roles:
+    - name: pulumi-infra
+      template: templates/pulumi_infra_role.json.j2
+      policy: templates/pulumi_infra_policy.json.j2
+      description: "OIDC role for pulumi infrastructure"
+      repositories:
+        - pulumi-infra
