@@ -11,4 +11,5 @@ destroy: $(ANSIBLE_COLLECTIONS_PATH)
 	poetry run ansible-playbook playbook.yml --tags destroy
 clean:
 	rm -rf .ansible/collections
+	rm -rf .venv
 .PHONY: clean

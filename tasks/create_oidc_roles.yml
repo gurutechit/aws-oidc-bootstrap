@@ -12,6 +12,7 @@
   loop_control:
     loop_var: role
   tags: [ create ]
+  no_log: "{{hide_sensitive_logs | default('True')|bool}}"
 
 - name: Create a policy for iam
   amazon.aws.iam_policy:
@@ -24,6 +25,7 @@
   loop_control:
     loop_var: role
   tags: [ create ]
+  no_log: "{{hide_sensitive_logs | default('True')|bool}}"
 
 - name: Remove OIDC roles
   community.aws.iam_role:
@@ -33,3 +35,5 @@
   loop_control:
     loop_var: role
   tags: [ never, destroy ]
+  no_log: "{{hide_sensitive_logs | default('True')|bool}}"
+  

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "bootstrap-aws"
+name = "aws-oidc-bootstrap"
 version = "0.1.0"
 description = ""
 authors = ["Gianluca Mascolo <gianluca@gurutech.it>"]
