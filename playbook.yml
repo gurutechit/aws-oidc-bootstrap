@@ -19,12 +19,11 @@
 
     - name: Configure OIDC provider
       include_tasks: tasks/create_oidc_provider.yml
-      when: not oidc_exist|default('False')|bool
-      tags: [ always, create ]
+      tags: [ always ]
 
     - name: Configure OIDC roles
       include_tasks: tasks/create_oidc_roles.yml
-      tags: [ always, create ]
+      tags: [ always ]
 
     - name: Pulumi state bucket
       amazon.aws.s3_bucket:
